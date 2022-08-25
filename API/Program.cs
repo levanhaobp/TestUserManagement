@@ -1,5 +1,7 @@
 using Application;
 using Infrastructure;
+using Infrastructure.Contexts;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -60,7 +62,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+using (var serviceScope = app.Services.GetService<IServiceScopeFactory>().CreateScope())
+{
+    var applicationContext = serviceScope.ServiceProvider.GetRequiredService<ApplicationContext>();
+    applicationContext.Database.Migrate();
+}
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
